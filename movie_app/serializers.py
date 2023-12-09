@@ -1,18 +1,47 @@
 from rest_framework import serializers
-from .models import Director, Movie, Review
+from .models import Director, Movie, Review, Category
 
 
-class DirectorSer(serializers.ModelSerializer):
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = "__all__"
+
+
+class DirectorSerializer(serializers.ModelSerializer):
+    count_of_movie = serializers.SerializerMethodField()
     class Meta:
         model = Director
-        fields = '__all__'
+        fields = 'id name count_of_movie'.split()
 
-class MovieSer(serializers.ModelSerializer):
+    def get_count_of_movie(self, director):
+        return director.movie_set.count()
+
+
+
+class MovieSerializer(serializers.ModelSerializer):
+    category = serializers.SerializerMethodField()
+    reviews = serializers.SerializerMethodField()
+
     class Meta:
         model = Movie
-        fields = '__all__'
+        fields = 'id title director category reviews count_reviews all_reviews'.split()
 
-class ReviewSer(serializers.ModelSerializer):
+    def get_category(self, movie):
+        try:
+            return movie.category.name
+        except:
+            return 'No category'
+
+    def get_reviews(self, movie):
+        serializer = ReviewSerializer(Review.objects.filter(author__isnull=False, movie=movie),
+                                      many=True)
+        return serializer.data
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    rate = serializers.SerializerMethodField()
+
     class Meta:
         model = Review
-        fields = '__all__'
+        fields = 'id text rate_stars author movie'
