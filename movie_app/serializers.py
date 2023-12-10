@@ -21,11 +21,10 @@ class DirectorSerializer(serializers.ModelSerializer):
 
 class MovieSerializer(serializers.ModelSerializer):
     category = serializers.SerializerMethodField()
-    reviews = serializers.SerializerMethodField()
 
     class Meta:
         model = Movie
-        fields = 'id title director category reviews count_reviews all_reviews'.split()
+        fields = 'id title director category count_reviews all_reviews avg_reviews'.split()
 
     def get_category(self, movie):
         try:
@@ -33,15 +32,9 @@ class MovieSerializer(serializers.ModelSerializer):
         except:
             return 'No category'
 
-    def get_reviews(self, movie):
-        serializer = ReviewSerializer(Review.objects.filter(author__isnull=False, movie=movie),
-                                      many=True)
-        return serializer.data
-
 
 class ReviewSerializer(serializers.ModelSerializer):
-    rate = serializers.SerializerMethodField()
 
     class Meta:
         model = Review
-        fields = 'id text rate_stars author movie'
+        fields = '__all__'

@@ -49,16 +49,3 @@ def reviews_detail(request, review_id):
     data = ReviewSerializer(reviews).data
     return Response(data=data)
 
-@api_view(['GET'])
-def test(request):
-    context = {
-        'name': "John",
-        'age': 12,
-        'hobby': 'swimming',
-        'boolean': True,
-        'list': [
-            '1', '2', '3'
-        ]
-    }
-
-    return Response(data=context)
